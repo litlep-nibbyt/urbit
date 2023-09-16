@@ -2198,6 +2198,70 @@
             -1
           --1
   --
+++  ct  :: 8-bit twos complement signed integer
+  ^|
+  |_  bloq=_3
+  ::
+  ++  len  (bex bloq)
+  ++  msb
+    |=  a=@
+    ?:  (^lth (xeb a) len)
+      0
+    1
+  ++  ones  (dec len)
+  ++  s-to-twoc
+    |=  a=@s
+    ^-  @
+    ?>  (lte `@`a (dec ~(out fe bloq)))
+    %+  mix
+      (rsh 0 a) 
+    (~(sum fe bloq) (not 0 len (dis a 1)) 1)
+  ++  twoc-to-s
+    |=  a=@
+    ^-  @s
+    ?:  =(1 (msb a))
+      (new:si | +((sub (dec (bex len)) a)))
+    (new:si & a)
+  ++  add
+    |=  [a=@ b=@]
+    =/  res  (^add a b)
+    ?.  (^gth (xeb res) len)
+      res 
+    =/  rez=@  (rep 0 (snip (rip [0 1] res)))
+    ?:  !(overflow a b rez)
+      rez
+    !!
+  ++  overflow
+    |=  [a=@ b=@ c=@]
+    ?|  &(=(0 (msb c)) =(1 (msb a)) =(1 (msb b)))
+        &(=(1 (msb c)) =(0 (msb a)) =(0 (msb a)))
+    ==
+  ++  mul
+    |=  [a=@ b=@]
+    =/  ae  (rep bloq ~[a (extend a)])
+    =/  be  (rep bloq ~[b (extend b)])
+    =/  c  (cut 0 [0 (^mul 2 len)] (^mul ae be))
+    ?:  (lte (xeb c) len)
+      c
+    ?:  !=((dec (bex len)) (cut 0 [len len] c))
+      !!
+    (cut 0 [0 len] c)
+  ++  extend
+    |=  a=@
+    ^-  @
+    ?:  =((msb a) 0)
+      0
+    (dec (bex len))
+  ++  gth
+    |=  [a=@ b=@]
+    ::
+    ::  check for different signs
+    ?:  =(1 (mix (msb a) (msb b)))
+      =(0 (msb a))
+    (^gth a b)
+  ::
+  ++  lth  |=([a=@ b=@] !(gth a b))
+  --
 ::
 ::    3b: floating point
 +|  %floating-point
@@ -4239,11 +4303,12 @@
   ?&  ?|  =(1 tef)
           =+  i=1
           |-  ^-  ?
-          ?|  =(i tef)
+          ?|
+              =(i tef)
               ?&  (gte (cut 3 [(add i inx) 1] b) 128)
                   $(i +(i))
       ==  ==  ==
-      $(inx (add inx tef))
+      $(inx +(inx))
   ==
 ::
 ++  ruth                                                ::  biblical sanity
@@ -5512,6 +5577,12 @@
             ?:((syn:si q.p.lot) "--" "-")
           $(yed 'u', q.p.lot (abs:si q.p.lot))
         ::
+            %j
+          =/  s=@s  (twoc-to-s:ct q.p.lot)
+          %+  weld
+            ?:((syn:si s) ",--" ",-")
+          $(yed 'u', q.p.lot (abs:si s))
+        ::
             %t
           ?:  =('a' hay)
             ?:  =('s' (cut 3 [2 1] p.p.lot))
@@ -5712,6 +5783,7 @@
     :~  :-  ['a' 'z']  (cook |=(a=@ta [%$ %tas a]) sym)
         :-  ['0' '9']  (stag %$ bisk)
         :-  '-'        (stag %$ tash)
+        :-  ','        (stag %$ tish)
         :-  '.'        ;~(pfix dot perd)
         :-  '~'        ;~(pfix sig ;~(pose twid (easy [%$ %n 0])))
     ==
@@ -5795,6 +5867,21 @@
         (cook |=(a=dime (neg | a)) bisk)
         ;~(pfix hep (cook |=(a=dime (neg & a)) bisk))
       ==
+    ==
+  ::
+  ++  tish
+    ~+
+    =+  ^=  neg
+        |=  [syn=? mol=dime]  ^-  dime
+        ?>  =('u' (end 3 p.mol))
+        [(cat 3 'j' (rsh 3 p.mol)) (s-to-twoc:ct (new:si syn q.mol))]
+    ;~  pfix  com
+        ;~  pfix  hep
+          ;~  pose
+            (cook |=(a=dime (neg | a)) bisk)
+            ;~(pfix hep (cook |=(a=dime (neg & a)) bisk))
+          ==
+        ==
     ==
   ::
   ++  twid
@@ -12858,6 +12945,7 @@
     :~
       :-  ','
         ;~  pose
+          (stag %sand tish:so)
           (stag %ktcl ;~(pfix com wyde))
           (stag %wing rope)
         ==
