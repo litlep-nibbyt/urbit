@@ -4239,11 +4239,12 @@
   ?&  ?|  =(1 tef)
           =+  i=1
           |-  ^-  ?
-          ?|  =(i tef)
+          ?|
+              =(i tef)
               ?&  (gte (cut 3 [(add i inx) 1] b) 128)
                   $(i +(i))
       ==  ==  ==
-      $(inx (add inx tef))
+      $(inx +(inx))
   ==
 ::
 ++  ruth                                                ::  biblical sanity
@@ -6420,6 +6421,7 @@
   ::                                            ::::::  tuples
     [%clcb p=hoon q=hoon]                               ::  :_ [q p]
     [%clkt p=hoon q=hoon r=hoon s=hoon]                 ::  :^ [p q r s]
+    [%clhx p=hoon q=hoon r=hoon s=hoon t=hoon]          ::  :^ [p q r s]
     [%clhp p=hoon q=hoon]                               ::  :- [p q]
     [%clls p=hoon q=hoon r=hoon]                        ::  :+ [p q r]
     [%clsg p=(list hoon)]                               ::  :~ [p ~]
@@ -6435,6 +6437,7 @@
     [%cnsg p=wing q=hoon r=(list hoon)]                 ::  %~
     [%cnts p=wing q=(list (pair wing hoon))]            ::  %=
   ::                                            ::::::  nock
+    [%dthx p=@ q=hoon r=hoon]                           ::  .#  nock 10
     [%dtkt p=spec q=hoon]                               ::  .^  nock 11
     [%dtls p=hoon]                                      ::  .+  nock 4
     [%dttr p=hoon q=hoon]                               ::  .*  nock 2
@@ -8427,6 +8430,7 @@
                    (~(put by *(map term hoon)) %$ q.gen)
         [%brwt *]  [%ktwt %brdt p.gen]
     ::
+        [%clhx *]  [p.gen q.gen r.gen s.gen t.gen]
         [%clkt *]  [p.gen q.gen r.gen s.gen]
         [%clls *]  [p.gen q.gen r.gen]
         [%clcb *]  [q.gen p.gen]
@@ -9918,6 +9922,9 @@
     ::
         [%cnts *]  (~(mint et p.gen q.gen) gol)
     ::
+        [%dthx *]
+      [(nice %noun) [%10 [p.gen q:$(gen q.gen, gol %noun)] q:$(gen r.gen, gol %noun)]]
+    ::
         [%dtkt *]
       =+  nef=$(gen [%kttr p.gen])
       [p.nef [%12 [%1 hoon-version p.nef] q:$(gen q.gen, gol %noun)]]
@@ -10097,6 +10104,9 @@
         [%dtls *]  =+($(gen p.gen, gol [%atom %$ ~]) (beth [%atom %$ ~]))
         [%sand *]  (beth (play gen))
         [%rock *]  (beth (play gen))
+    ::
+        [%dthx *]
+      =+([$(gen q.gen, gol %noun) $(gen r.gen, gol %noun)] (beth %noun))
     ::
         [%dttr *]
       =+([$(gen p.gen, gol %noun) $(gen q.gen, gol %noun)] (beth %noun))
@@ -10478,6 +10488,7 @@
                    [%atom p.gen ~]
                  $(-.gen %rock)
       [%tune *]  (face p.gen sut)
+      [%dthx *]  %noun
       [%dttr *]  %noun
       [%dtts *]  bool
       [%dtwt *]  bool
@@ -13246,6 +13257,7 @@
                   ['-' (rune hep %clhp expb)]
                   ['~' (rune sig %clsg exps)]
                   ['*' (rune tar %cltr exps)]
+                  ['#' (rune hax %clhx exp5)]
               ==
             ==
           :-  '.'
@@ -13257,6 +13269,7 @@
                   ['=' (rune tis %dtts expb)]
                   ['?' (rune wut %dtwt expa)]
                   ['^' (rune ket %dtkt exqn)]
+                  ['#' (rune hax %dthx exp10)]
               ==
             ==
           :-  '^'
@@ -13616,6 +13629,7 @@
     ++  expb  |.(;~(goop loaf loaf))                    ::  two hoons
     ++  expc  |.(;~(goop loaf loaf loaf))               ::  three hoons
     ++  expd  |.(;~(goop loaf loaf loaf loaf))          ::  four hoons
+    ++  exp5  |.(;~(goop loaf loaf loaf loaf loaf))     ::  five hoons
     ++  expe  |.(wisp)                                  ::  core tail
     ++  expf  |.(;~(goop ;~(pfix cen sym) loaf))        ::  %term and hoon
     ++  expg  |.(;~(gunk lomp loll loaf))               ::  term/spec, two hoons
@@ -13623,7 +13637,8 @@
     ++  expi  |.((butt ;~(goop loaf hank)))             ::  one or more hoons
     ++  expj  |.(;~(goop lore loaf))                    ::  skin and hoon
    :: ++  expk  |.(;~(gunk loaf ;~(plug loaf (easy ~))))::  list of two hoons
-   :: ++  expl  |.(;~(gunk sym loaf loaf))              ::  term, two hoons
+  :: ++  expl  |.(;~(gunk sym loaf loaf))              ::  term, two hoons
+    ++  exp10  |.(;~(gunk dem loaf loaf))              ::  term, two hoons
     ++  expm  |.((butt ;~(gunk rope loaf rick)))        ::  several [spec hoon]s
     ++  expn  |.  ;~  gunk  rope  loaf                  ::  wing, hoon,
                     ;~(plug loaf (easy ~))              ::  list of one hoon
